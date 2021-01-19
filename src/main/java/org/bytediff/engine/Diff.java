@@ -34,21 +34,22 @@ public class Diff {
     }
 
 
-    public DiffInfo compute(char[] sourceCP, char[] targetCP) {
+    public static DiffInfo compute(char[] sourceCP, char[] targetCP) {
         List<EditNode> path = computeEditPath(sourceCP, targetCP);
         DiffInfo info = computeInfo(path, sourceCP, targetCP);
         enforceSurrogatePairs(info);
         return info;
     }
 
-    private void enforceSurrogatePairs(DiffInfo info) {
+    private static void enforceSurrogatePairs(DiffInfo info) {
         List<DiffInfo.Info> infos = info.getInfo();
         for (int i = 0; i < infos.size() - 1; i++) {
 
             DiffInfo.Info curr = infos.get(i);
             DiffInfo.Info next = infos.get(i + 1);
 
-            char candidate = info.getSource()[curr.getSourceEnd()];
+            int idx = curr.getSourceEnd();
+            char candidate = idx >= 0 ? info.getSource()[curr.getSourceEnd()] : (char)-1;
             if (Surrogate.isHigh(candidate)) {
                 if (curr.getInfoType() == DiffInfo.InfoType.MATCH
                         && next.getInfoType() == DiffInfo.InfoType.REPLACE) {
@@ -69,7 +70,7 @@ public class Diff {
     }
 
 
-    private DiffInfo computeInfo(List<EditNode> path, char[] source, char[] target) {
+    private static DiffInfo computeInfo(List<EditNode> path, char[] source, char[] target) {
 
         List<EditNode> inserts = new ArrayList<>();
         List<EditNode> deletes = new ArrayList<>();
@@ -106,7 +107,7 @@ public class Diff {
         return info;
     }
 
-    private void onMatch(List<EditNode> inserts, List<EditNode> deletes, List<EditNode> insertsOrDeletes, DiffInfo info) {
+    private static void onMatch(List<EditNode> inserts, List<EditNode> deletes, List<EditNode> insertsOrDeletes, DiffInfo info) {
         if (!inserts.isEmpty() && !deletes.isEmpty()
                 && inserts.size() == deletes.size()) {
 
@@ -139,7 +140,7 @@ public class Diff {
         }
     }
 
-    private void onInsertionOrDeletion(List<EditNode> matches, DiffInfo info) {
+    private static void onInsertionOrDeletion(List<EditNode> matches, DiffInfo info) {
         if (!matches.isEmpty()) {
             int start = matches.get(0).getSourceIndex();
             int end = matches.get(matches.size() - 1).getSourceIndex();
@@ -151,7 +152,7 @@ public class Diff {
         }
     }
 
-    private List<EditNode> computeEditPath(char[] sourceCP, char[] targetCP) {
+    private static List<EditNode> computeEditPath(char[] sourceCP, char[] targetCP) {
 
         int N = sourceCP.length;
         int M = targetCP.length;
