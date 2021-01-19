@@ -33,22 +33,22 @@ public class DiffInfo {
         this.info = new ArrayList<>();
     }
 
-    public void addInsertion(int start, int end, int targetStart, int targetEnd) {
+    void addInsertion(int start, int end, int targetStart, int targetEnd) {
         info.add(
                 new Info(InfoType.INSERT, start, end, targetStart, targetEnd));
     }
 
-    public void addDeletion(int start, int end, int before) {
+    void addDeletion(int start, int end, int before) {
         info.add(
                 new Info(InfoType.DELETE, start, end, before, before));
     }
 
-    public void addReplacement(int start, int end, int targetStart, int targetEnd) {
+    void addReplacement(int start, int end, int targetStart, int targetEnd) {
         info.add(
                 new Info(InfoType.REPLACE, start, end, targetStart, targetEnd));
     }
 
-    public void addMatch(int start, int end, int targetStart, int targetEnd) {
+    void addMatch(int start, int end, int targetStart, int targetEnd) {
         info.add(
                 new Info(InfoType.MATCH, start, end, targetStart, targetEnd));
     }

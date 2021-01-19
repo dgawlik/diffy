@@ -34,18 +34,11 @@ public class Diff {
     }
 
 
-    public DiffInfo compute(byte[] source, byte[] target, Charset charset) {
-        try {
-            char[] sourceCP = charset.newDecoder().decode(ByteBuffer.wrap(source)).array();
-            char[] targetCP = charset.newDecoder().decode(ByteBuffer.wrap(target)).array();
-
-            List<EditNode> path = computeEditPath(sourceCP, targetCP);
-            DiffInfo info = computeInfo(path, sourceCP, targetCP);
-            enforceSurrogatePairs(info);
-            return info;
-        } catch (CharacterCodingException e) {
-            throw new IllegalArgumentException("Not possible to decode source or target", e);
-        }
+    public DiffInfo compute(char[] sourceCP, char[] targetCP) {
+        List<EditNode> path = computeEditPath(sourceCP, targetCP);
+        DiffInfo info = computeInfo(path, sourceCP, targetCP);
+        enforceSurrogatePairs(info);
+        return info;
     }
 
     private void enforceSurrogatePairs(DiffInfo info) {

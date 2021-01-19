@@ -12,21 +12,21 @@ public class UseCasesTest {
 
     @Test
     public void mismatch_1() {
-        byte[] source = "aJohnDoe".getBytes(StandardCharsets.UTF_8);
-        byte[] target = "aBBBBDoe".getBytes(StandardCharsets.UTF_8);
+        char[] source = "aJohnDoe".toCharArray();
+        char[] target = "aBBBBDoe".toCharArray();
 
         Diff d = new Diff();
-        DiffInfo info = d.compute(source, target, StandardCharsets.UTF_8);
+        DiffInfo info = d.compute(source, target);
         System.out.println(PrettyDisplay.from(info).display());
     }
 
     @Test
     public void mismatch_2() {
-        byte[] source = "abJohnDoe😉".getBytes(StandardCharsets.UTF_16);
-        byte[] target = "abcJohnDoe😊".getBytes(StandardCharsets.UTF_16);
+        char[] source = "abdJohnDoe😉".toCharArray();
+        char[] target = "abcaaJohnDoe😊".toCharArray();
 
         Diff d = new Diff();
-        DiffInfo info = d.compute(source, target, StandardCharsets.UTF_16);
+        DiffInfo info = d.compute(source, target);
         System.out.println(PrettyDisplay.from(info).display());
     }
 
