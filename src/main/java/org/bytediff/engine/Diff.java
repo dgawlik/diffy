@@ -120,7 +120,7 @@ public class Diff {
             int start = insertsOrDeletes.get(0).getSourceIndex();
             int end = insertsOrDeletes.get(insertsOrDeletes.size() - 1).getSourceIndex();
             int startTarget = insertsOrDeletes.get(0).getTargetIndex();
-            int endTarget = startTarget + (end - start);
+            int endTarget = insertsOrDeletes.get(insertsOrDeletes.size() - 1).getTargetIndex();
 
             info.addReplacement(start, end, startTarget, endTarget);
             inserts.clear();
@@ -198,7 +198,7 @@ public class Diff {
                 currentN.setSourceIndex(x - 1);
                 currentN.setParent(prevN);
                 currentN.setTargetIndex(y - 1);
-                while (x < N-1 && y < M-1 && sourceCP[x] == targetCP[y]) {
+                while (x < N && y < M && sourceCP[x] == targetCP[y]) {
 
                     x++;
                     y++;
@@ -213,7 +213,7 @@ public class Diff {
                 V[middleV + k] = x;
                 Vnodes[middleV + k] = currentN;
 
-                if (x >= N-1 && y >= M-1) {
+                if (x >= N && y >= M) {
                     LinkedList<EditNode> path = new LinkedList<>();
                     EditNode it = currentN;
                     while (it != null) {
