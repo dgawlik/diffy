@@ -1,12 +1,12 @@
 package org.bytediff.engine;
 
 import lombok.Data;
+import sun.nio.cs.Surrogate;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Diff {
 
@@ -33,16 +33,50 @@ public class Diff {
         }
     }
 
-    public DiffInfo compute(byte[] source, byte[] target, Charset charset) {
-        int[] sourceCP = new String(source, charset).codePoints().toArray();
-        int[] targetCP = new String(target, charset).codePoints().toArray();
 
-        List<EditNode> path = computeEditPath(sourceCP, targetCP);
-        return computeInfo(path, charset, source, target);
+    public DiffInfo compute(byte[] source, byte[] target, Charset charset) {
+        try {
+            char[] sourceCP = charset.newDecoder().decode(ByteBuffer.wrap(source)).array();
+            char[] targetCP = charset.newDecoder().decode(ByteBuffer.wrap(target)).array();
+
+            List<EditNode> path = computeEditPath(sourceCP, targetCP);
+            DiffInfo info = computeInfo(path, sourceCP, targetCP);
+            enforceSurrogatePairs(info);
+            return info;
+        } catch (CharacterCodingException e) {
+            throw new IllegalArgumentException("Not possible to decode source or target", e);
+        }
     }
 
-    public DiffInfo computeInfo(List<EditNode> path, Charset charset,
-                                byte[] source, byte[] target) {
+    private void enforceSurrogatePairs(DiffInfo info) {
+        List<DiffInfo.Info> infos = info.getInfo();
+        for (int i = 0; i < infos.size() - 1; i++) {
+
+            DiffInfo.Info curr = infos.get(i);
+            DiffInfo.Info next = infos.get(i + 1);
+
+            char candidate = info.getSource()[curr.getSourceEnd()];
+            if (Surrogate.isHigh(candidate)) {
+                if (curr.getInfoType() == DiffInfo.InfoType.MATCH
+                        && next.getInfoType() == DiffInfo.InfoType.REPLACE) {
+                    curr.setSourceEnd(curr.getSourceEnd() - 1);
+                    next.setSourceStart(next.getSourceStart() - 1);
+                    curr.setTargetEnd(curr.getTargetStart() - 1);
+                    next.setTargetStart(next.getTargetEnd() - 1);
+                }
+                if (curr.getInfoType() == DiffInfo.InfoType.REPLACE
+                        && next.getInfoType() == DiffInfo.InfoType.MATCH) {
+                    curr.setSourceEnd(curr.getSourceEnd() + 1);
+                    next.setSourceStart(next.getSourceStart() + 1);
+                    curr.setTargetEnd(curr.getTargetStart() + 1);
+                    next.setTargetStart(next.getTargetEnd() + 1);
+                }
+            }
+        }
+    }
+
+
+    private DiffInfo computeInfo(List<EditNode> path, char[] source, char[] target) {
 
         List<EditNode> inserts = new ArrayList<>();
         List<EditNode> deletes = new ArrayList<>();
@@ -51,7 +85,7 @@ public class Diff {
 
         path = path.subList(2, path.size());
 
-        DiffInfo info = new DiffInfo(charset, source, target);
+        DiffInfo info = new DiffInfo(source, target);
 
         for (EditNode node : path) {
             Op op = node.getOperation();
@@ -124,7 +158,7 @@ public class Diff {
         }
     }
 
-    public List<EditNode> computeEditPath(int[] sourceCP, int[] targetCP) {
+    private List<EditNode> computeEditPath(char[] sourceCP, char[] targetCP) {
 
         int N = sourceCP.length;
         int M = targetCP.length;
@@ -163,13 +197,14 @@ public class Diff {
                 int y = x - k;
                 currentN.setSourceIndex(x - 1);
                 currentN.setParent(prevN);
-                currentN.setTargetIndex(y);
-                while (x < N && y < M && sourceCP[x] == targetCP[y]) {
+                currentN.setTargetIndex(y - 1);
+                while (x < N-1 && y < M-1 && sourceCP[x] == targetCP[y]) {
+
                     x++;
                     y++;
                     EditNode nextN = new EditNode();
                     nextN.setSourceIndex(x - 1);
-                    nextN.setTargetIndex(y);
+                    nextN.setTargetIndex(y - 1);
                     nextN.setParent(currentN);
                     nextN.setOperation(Op.MATCH);
                     currentN = nextN;
@@ -178,7 +213,7 @@ public class Diff {
                 V[middleV + k] = x;
                 Vnodes[middleV + k] = currentN;
 
-                if (x >= N && y >= M) {
+                if (x >= N-1 && y >= M-1) {
                     LinkedList<EditNode> path = new LinkedList<>();
                     EditNode it = currentN;
                     while (it != null) {
@@ -191,4 +226,5 @@ public class Diff {
         }
         throw new IllegalStateException("Algorithm implemented incorrectly");
     }
+
 }

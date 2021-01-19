@@ -1,5 +1,7 @@
 package org.bytediff.engine;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Value;
 
 import java.nio.charset.Charset;
@@ -11,22 +13,21 @@ public class DiffInfo {
         INSERT, DELETE, REPLACE, MATCH;
     }
 
-    @Value
+    @Data
+    @AllArgsConstructor
     public static class Info {
-        InfoType infoType;
-        Integer sourceStart;
-        Integer sourceEnd;
-        Integer targetStart;
-        Integer targetEnd;
+        private InfoType infoType;
+        private Integer sourceStart;
+        private Integer sourceEnd;
+        private Integer targetStart;
+        private Integer targetEnd;
     }
 
     private final List<Info> info;
-    private final Charset charset;
-    private final byte[] source;
-    private final byte[] target;
+    private final char[] source;
+    private final char[] target;
 
-    public DiffInfo(Charset charset, byte[] source, byte[] target) {
-        this.charset = charset;
+    public DiffInfo(char[] source, char[] target) {
         this.source = source;
         this.target = target;
         this.info = new ArrayList<>();
@@ -56,15 +57,12 @@ public class DiffInfo {
         return this.info;
     }
 
-    public Charset getCharset() {
-        return this.charset;
-    }
 
-    public byte[] getSource() {
+    public char[] getSource() {
         return this.source;
     }
 
-    public byte[] getTarget() {
+    public char[] getTarget() {
         return this.target;
     }
 }

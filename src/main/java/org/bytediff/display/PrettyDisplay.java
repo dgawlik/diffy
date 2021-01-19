@@ -60,8 +60,8 @@ public class PrettyDisplay {
     }
 
     public String display() {
-        String sourceS = new String(this.info.getSource(), this.info.getCharset());
-        String targetS = new String(this.info.getTarget(), this.info.getCharset());
+        String sourceS = new String(this.info.getSource());
+        String targetS = new String(this.info.getTarget());
 
         StringBuilder sb = new StringBuilder();
 
@@ -83,7 +83,7 @@ public class PrettyDisplay {
             }
 
             sb.append(ansiColor(fgColor, bgColor))
-                    .append(s, start, s.offsetByCodePoints(start, end - start + 1))
+                    .append(s, start, end+1)
                     .append(ansiResetColor());
         }
         return sb.toString();

@@ -15,8 +15,8 @@ public class BasicDisplay {
     }
 
     public String display() {
-        String sourceS = new String(this.info.getSource(), this.info.getCharset());
-        String targetS = new String(this.info.getTarget(), this.info.getCharset());
+        String sourceS = new String(this.info.getSource());
+        String targetS = new String(this.info.getTarget());
 
         StringBuilder sb = new StringBuilder();
         for (DiffInfo.Info info : this.info.getInfo()) {

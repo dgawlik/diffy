@@ -22,8 +22,8 @@ public class UseCasesTest {
 
     @Test
     public void mismatch_2() {
-        byte[] source = "JohnDoe😉".getBytes(StandardCharsets.UTF_16);
-        byte[] target = "JohnDoe😊".getBytes(StandardCharsets.UTF_16);
+        byte[] source = "abJohnDoe😉".getBytes(StandardCharsets.UTF_16);
+        byte[] target = "abcJohnDoe😊".getBytes(StandardCharsets.UTF_16);
 
         Diff d = new Diff();
         DiffInfo info = d.compute(source, target, StandardCharsets.UTF_16);
