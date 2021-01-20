@@ -1,6 +1,8 @@
 package org.bytediff.print;
 
 import org.bytediff.engine.DiffInfo;
+import org.bytediff.print.enc.Encoder;
+import org.bytediff.print.enc.IdEncoder;
 import org.bytediff.print.fmt.Formatter;
 import org.bytediff.print.fmt.SymbolFormatter;
 
@@ -10,6 +12,7 @@ public class Printer {
     private DiffInfo info;
     private boolean isCompact;
     private Formatter fmt;
+    private Encoder enc;
     private int contextLeft;
     private int contextRight;
 
@@ -20,6 +23,7 @@ public class Printer {
         this.fmt = new SymbolFormatter();
         this.contextLeft = 5;
         this.contextRight = 5;
+        this.enc = new IdEncoder();
     }
 
     public String print() {
@@ -43,7 +47,7 @@ public class Printer {
                     s = sourceS;
                 }
 
-                sb.append(fmt.format(s.substring(start, end), el.getInfoType()));
+                sb.append(fmt.format(enc.encode(s.substring(start, end)), el.getInfoType()));
             } else {
                 if (el.getInfoType() == DiffInfo.InfoType.MATCH) {
                     continue;
@@ -60,10 +64,10 @@ public class Printer {
                 String diff;
                 if (el.getInfoType() == DiffInfo.InfoType.REPLACE
                         || el.getInfoType() == DiffInfo.InfoType.INSERT) {
-                    diff = fmt.format(targetS.substring(
-                            el.getTargetStart(), el.getTargetEnd() + 1), el.getInfoType());
+                    diff = fmt.format(enc.encode(targetS.substring(
+                            el.getTargetStart(), el.getTargetEnd() + 1)), el.getInfoType());
                 } else {
-                    diff = fmt.format(sourceS.substring(start, end), el.getInfoType());
+                    diff = fmt.format(enc.encode(sourceS.substring(start, end)), el.getInfoType());
                 }
 
                 String line = "*> "
@@ -77,19 +81,6 @@ public class Printer {
             }
         }
         return sb.toString();
-    }
-
-    private String abbrev(DiffInfo.InfoType type) {
-        switch (type) {
-            case INSERT:
-                return "insert";
-            case DELETE:
-                return "delete";
-            case REPLACE:
-                return "replace";
-            default:
-                return "match";
-        }
     }
 
     public static Printer from(DiffInfo info) {
@@ -113,6 +104,11 @@ public class Printer {
 
     public Printer withFormatter(Formatter fmt) {
         this.fmt = fmt;
+        return this;
+    }
+
+    public Printer withEncoding(Encoder enc) {
+        this.enc = enc;
         return this;
     }
 
