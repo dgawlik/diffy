@@ -5,6 +5,7 @@ import com.sun.tools.javac.util.List;
 import org.bytediff.print.Printer;
 import org.bytediff.engine.Diff;
 import org.bytediff.engine.DiffInfo;
+import org.bytediff.print.fmt.AnsiColorFormatter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,12 +31,13 @@ public class UseCasesTest {
 
 
     @Test
-    public void verbose(){
+    public void verbose() {
         char[] source = "jooohnbb".toCharArray();
         char[] target = "johnaa".toCharArray();
 
         DiffInfo info = Diff.compute(source, target);
-        System.out.println(Printer.from(info).verbose().print());
+        Printer p = Printer.from(info).withFormatter(new AnsiColorFormatter());
+        System.out.println(p.print());
     }
 
 
