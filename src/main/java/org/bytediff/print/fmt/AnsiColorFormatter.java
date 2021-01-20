@@ -1,11 +1,11 @@
-package org.bytediff.display;
+package org.bytediff.print.fmt;
 
-import org.bytediff.engine.Diff;
 import org.bytediff.engine.DiffInfo;
 
 import java.util.EnumMap;
 
-public class PrettyDisplay {
+public class AnsiColorFormatter implements Formatter {
+
     public enum ForegroundColor {
         BLACK(30), RED(31), GREEN(32),
         YELLOW(33), BLUE(34), MAGENTA(35),
@@ -38,14 +38,10 @@ public class PrettyDisplay {
         }
     }
 
-    private DiffInfo info;
-    private boolean isCompact;
     EnumMap<DiffInfo.InfoType, ForegroundColor> fgColor;
     EnumMap<DiffInfo.InfoType, BackgroundColor> bgColor;
 
-    private PrettyDisplay(DiffInfo info) {
-        this.info = info;
-        this.isCompact = true;
+    public AnsiColorFormatter() {
         fgColor = new EnumMap<>(DiffInfo.InfoType.class);
         bgColor = new EnumMap<>(DiffInfo.InfoType.class);
 
@@ -59,64 +55,33 @@ public class PrettyDisplay {
         fgColor.put(DiffInfo.InfoType.REPLACE, ForegroundColor.BLACK);
     }
 
-    public String display() {
-        String sourceS = new String(this.info.getSource());
-        String targetS = new String(this.info.getTarget());
-
-        StringBuilder sb = new StringBuilder();
-
-        for (DiffInfo.Info el : this.info.getInfo()) {
-            ForegroundColor fgColor = this.fgColor.get(el.getInfoType());
-            BackgroundColor bgColor = this.bgColor.get(el.getInfoType());
-
-            int start, end;
-            String s;
-            if (el.getInfoType() == DiffInfo.InfoType.REPLACE
-                    || el.getInfoType() == DiffInfo.InfoType.INSERT) {
-                start = el.getTargetStart();
-                end = el.getTargetEnd();
-                s = targetS;
-            } else {
-                start = el.getSourceStart();
-                end = el.getSourceEnd();
-                s = sourceS;
-            }
-
-            sb.append(ansiColor(fgColor, bgColor))
-                    .append(s, start, end+1)
-                    .append(ansiResetColor());
-        }
-        return sb.toString();
-    }
-
-    public static PrettyDisplay from(DiffInfo info) {
-        return new PrettyDisplay(info);
-    }
-
-    public PrettyDisplay verbose() {
-        this.isCompact = false;
-        return this;
-    }
-
-    public PrettyDisplay withInsertionColors(ForegroundColor fgColor, BackgroundColor bgColor) {
+    public AnsiColorFormatter withInsertionColors(ForegroundColor fgColor, BackgroundColor bgColor) {
         this.fgColor.put(DiffInfo.InfoType.INSERT, fgColor);
         this.bgColor.put(DiffInfo.InfoType.INSERT, bgColor);
         return this;
     }
 
-    public PrettyDisplay withDeletionColors(ForegroundColor fgColor, BackgroundColor bgColor) {
+    public AnsiColorFormatter withDeletionColors(ForegroundColor fgColor, BackgroundColor bgColor) {
         this.fgColor.put(DiffInfo.InfoType.DELETE, fgColor);
         this.bgColor.put(DiffInfo.InfoType.DELETE, bgColor);
         return this;
     }
 
-    public PrettyDisplay withReplacementColors(ForegroundColor fgColor, BackgroundColor bgColor) {
+    public AnsiColorFormatter withReplacementColors(ForegroundColor fgColor, BackgroundColor bgColor) {
         this.fgColor.put(DiffInfo.InfoType.REPLACE, fgColor);
         this.bgColor.put(DiffInfo.InfoType.REPLACE, bgColor);
         return this;
     }
 
-    private String ansiColor(ForegroundColor fgColor, BackgroundColor bgColor) {
+    @Override
+    public String format(String value, DiffInfo.InfoType type) {
+        return ansiColor(type) + value + ansiResetColor();
+    }
+
+    private String ansiColor(DiffInfo.InfoType type) {
+        ForegroundColor fgColor = this.fgColor.get(type);
+        BackgroundColor bgColor = this.bgColor.get(type);
+
         return "\033[2;"
                 + (fgColor != null ? fgColor.getRepr() : 0)
                 + ";"

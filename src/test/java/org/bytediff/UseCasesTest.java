@@ -2,13 +2,11 @@ package org.bytediff;
 
 
 import com.sun.tools.javac.util.List;
-import org.bytediff.display.PrettyDisplay;
+import org.bytediff.print.Printer;
 import org.bytediff.engine.Diff;
 import org.bytediff.engine.DiffInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.nio.charset.StandardCharsets;
 
 public class UseCasesTest {
 
@@ -18,7 +16,7 @@ public class UseCasesTest {
         char[] target = "aBBBBDoe".toCharArray();
 
         DiffInfo info = Diff.compute(source, target);
-        System.out.println(PrettyDisplay.from(info).display());
+        System.out.println(Printer.from(info).print());
     }
 
     @Test
@@ -27,7 +25,7 @@ public class UseCasesTest {
         char[] target = "abcaaJohnDoe😊".toCharArray();
 
         DiffInfo info = Diff.compute(source, target);
-        System.out.println(PrettyDisplay.from(info).display());
+        System.out.println(Printer.from(info).print());
     }
 
     @Test

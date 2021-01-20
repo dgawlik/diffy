@@ -49,7 +49,7 @@ public class Diff {
             DiffInfo.Info next = infos.get(i + 1);
 
             int idx = curr.getSourceEnd();
-            char candidate = idx >= 0 ? info.getSource()[curr.getSourceEnd()] : (char)-1;
+            char candidate = idx >= 0 ? info.getSource()[curr.getSourceEnd()] : (char) -1;
             if (Surrogate.isHigh(candidate)) {
                 if (curr.getInfoType() == DiffInfo.InfoType.MATCH
                         && next.getInfoType() == DiffInfo.InfoType.REPLACE) {
@@ -74,7 +74,6 @@ public class Diff {
 
         List<EditNode> inserts = new ArrayList<>();
         List<EditNode> deletes = new ArrayList<>();
-        List<EditNode> insertsOrDeletes = new ArrayList<>();
         List<EditNode> matches = new ArrayList<>();
 
         path = path.subList(2, path.size());
@@ -87,39 +86,36 @@ public class Diff {
             if (op == Op.INSERT || op == Op.DELETE) {
                 if (op == Op.INSERT) {
                     inserts.add(node);
-                    insertsOrDeletes.add(node);
                 }
                 if (op == Op.DELETE) {
                     deletes.add(node);
-                    insertsOrDeletes.add(node);
                 }
                 onInsertionOrDeletion(matches, info);
             }
 
             if (op == Op.MATCH) {
                 matches.add(node);
-                onMatch(inserts, deletes, insertsOrDeletes, info);
+                onMatch(inserts, deletes, info);
             }
         }
         onInsertionOrDeletion(matches, info);
-        onMatch(inserts, deletes, insertsOrDeletes, info);
+        onMatch(inserts, deletes, info);
 
         return info;
     }
 
-    private static void onMatch(List<EditNode> inserts, List<EditNode> deletes, List<EditNode> insertsOrDeletes, DiffInfo info) {
+    private static void onMatch(List<EditNode> inserts, List<EditNode> deletes, DiffInfo info) {
         if (!inserts.isEmpty() && !deletes.isEmpty()
                 && inserts.size() == deletes.size()) {
 
-            int start = insertsOrDeletes.get(0).getSourceIndex();
-            int end = insertsOrDeletes.get(insertsOrDeletes.size() - 1).getSourceIndex();
-            int startTarget = insertsOrDeletes.get(0).getTargetIndex();
-            int endTarget = insertsOrDeletes.get(insertsOrDeletes.size() - 1).getTargetIndex();
+            int start = deletes.get(0).getSourceIndex();
+            int end = deletes.get(deletes.size() - 1).getSourceIndex();
+            int startTarget = inserts.get(0).getTargetIndex();
+            int endTarget = inserts.get(inserts.size() - 1).getTargetIndex();
 
             info.addReplacement(start, end, startTarget, endTarget);
             inserts.clear();
             deletes.clear();
-            insertsOrDeletes.clear();
         } else if (!inserts.isEmpty()) {
             int start = inserts.get(0).getSourceIndex();
             int end = inserts.get(inserts.size() - 1).getSourceIndex();
@@ -128,7 +124,6 @@ public class Diff {
 
             info.addInsertion(start, end, startTarget, endTarget);
             inserts.clear();
-            insertsOrDeletes.clear();
         } else if (!deletes.isEmpty()) {
             int start = deletes.get(0).getSourceIndex();
             int end = deletes.get(deletes.size() - 1).getSourceIndex();
@@ -136,7 +131,6 @@ public class Diff {
 
             info.addDeletion(start, end, before);
             deletes.clear();
-            insertsOrDeletes.clear();
         }
     }
 
