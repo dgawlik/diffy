@@ -28,17 +28,15 @@ public class UseCasesTest {
         System.out.println(Printer.from(info).print());
     }
 
+
     @Test
-    public void diff_info_api(){
-        char[] source = "bbcc".toCharArray();
-        char[] target = "aabb".toCharArray();
+    public void verbose(){
+        char[] source = "jooohnbb".toCharArray();
+        char[] target = "johnaa".toCharArray();
 
         DiffInfo info = Diff.compute(source, target);
-
-        Assertions.assertIterableEquals(info.getInserts(), List.of("aa"));
-        Assertions.assertIterableEquals(info.getInsertIndexes(), List.of(-1));
-        Assertions.assertIterableEquals(info.getDeletions(), List.of("cc"));
-        Assertions.assertIterableEquals(info.getDeletionIndexes(), List.of(2));
+        System.out.println(Printer.from(info).verbose().print());
     }
+
 
 }
