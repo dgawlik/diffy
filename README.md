@@ -60,3 +60,25 @@ DiffInfo info = Diff.compute(source, target);
 Printer p = Printer.from(info).withFormatter(new AnsiColorFormatter());
 System.out.println(p.print());
 ```
+
+##### Raw bytes
+
+With widening id conversion to char and printing character ordinal.
+
+```java
+byte[] source = new byte[]{1, 2, 3};
+byte[] target = new byte[]{4, 2, 3};
+
+char[] sourceC = Raw.bytesToChars(source);
+char[] targetC = Raw.bytesToChars(target);
+
+DiffInfo info = Diff.compute(sourceC, targetC);
+Printer p = Printer
+        .from(info)
+        .withEncoding(new RawValueEncoder(10));
+System.out.println(p.print());
+```
+Output
+```shell
+~~[\4 ]\2 \3
+```
