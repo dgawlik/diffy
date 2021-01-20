@@ -32,6 +32,11 @@ public class Printer {
 
         StringBuilder sb = new StringBuilder();
 
+        if (this.info.getInfo().size() == 1
+                && this.info.getInfo().get(0).getInfoType() == DiffInfo.InfoType.MATCH) {
+            return "Identical.";
+        }
+
         for (DiffInfo.Info el : this.info.getInfo()) {
             if (this.isCompact) {
                 int start, end;
