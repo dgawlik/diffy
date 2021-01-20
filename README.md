@@ -16,12 +16,12 @@ algorithm. It compares encoded char arrays and returns structure containing INSE
 Diffed string is displayed as line with modifications.
 
 ```java
-char[]source="jooohnbb".toCharArray();
-        char[]target="johnaa".toCharArray();
+char[] source="jooohnbb".toCharArray();
+char[] target="johnaa".toCharArray();
 
-        DiffInfo info=Diff.compute(source,target);
-        Printer p=Printer.from(info);
-        System.out.println(p.print());
+DiffInfo info=Diff.compute(source,target);
+Printer p=Printer.from(info);
+System.out.println(p.print());
 ```
 
 Output
