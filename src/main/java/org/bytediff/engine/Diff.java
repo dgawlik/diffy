@@ -1,7 +1,6 @@
 package org.bytediff.engine;
 
 import lombok.Data;
-import sun.nio.cs.Surrogate;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -50,7 +49,7 @@ public class Diff {
 
             int idx = curr.getSourceEnd();
             char candidate = idx >= 0 ? info.getSource()[curr.getSourceEnd()] : (char) -1;
-            if (Surrogate.isHigh(candidate)) {
+            if (Character.isHighSurrogate(candidate)) {
                 if (curr.getInfoType() == DiffInfo.InfoType.MATCH
                         && next.getInfoType() == DiffInfo.InfoType.REPLACE) {
                     curr.setSourceEnd(curr.getSourceEnd() - 1);

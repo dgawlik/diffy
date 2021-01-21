@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 group 'org.bytediff'
@@ -10,12 +11,31 @@ repositories {
     mavenCentral()
 }
 
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    pkg {
+        repo = 'generic'
+        name = 'diffy'
+        userOrg = 'dgawlik'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/dgawlik/diffy'
+        version {
+            name = '1.0-ALPHA'
+            desc = 'Diffy 1.0 Alpha'
+        }
+    }
+}
+
 java {
     withJavadocJar()
     withSourcesJar()
-    sourceCompatibility(JavaVersion.VERSION_1_8)
-    targetCompatibility(JavaVersion.VERSION_1_8)
 }
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
@@ -31,11 +51,11 @@ test {
     useJUnitPlatform()
 }
 
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId = 'diffy'
+            groupId = 'org.bytediff'
             from components.java
             pom {
                 name = 'Diffy'
@@ -57,21 +77,22 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/dgawlik/diffy"
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publications = ['mavenJava']
+    pkg {
+        repo = 'diffy'
+        name = 'diffy'
+        licenses = ['Apache-2.0']
     }
 }
 
 
 javadoc {
-    if(JavaVersion.current().isJava9Compatible()) {
+    if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
 }

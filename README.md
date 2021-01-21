@@ -9,6 +9,25 @@ algorithm. It compares encoded char arrays and returns structure containing INSE
 * adjusts offsets for surrogate pairs
 * symbolic, or colorful output to console
 
+### Installation
+
+```groovy
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://dl.bintray.com/dgawlik/diffy/'
+    }
+}
+```
+
+```groovy
+dependencies {
+    ...
+    implementation 'org.bytediff:diffy:1.0-ALPHA'
+}
+
+```
+
 ### Usage
 
 ##### Compact
