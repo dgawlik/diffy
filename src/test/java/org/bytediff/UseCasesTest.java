@@ -1,18 +1,13 @@
 package org.bytediff;
 
 
-import com.sun.tools.javac.util.List;
-import org.bytediff.engine.IdCharset;
-import org.bytediff.print.Printer;
 import org.bytediff.engine.Diff;
 import org.bytediff.engine.DiffInfo;
+import org.bytediff.print.Printer;
 import org.bytediff.print.enc.RawValueEncoder;
 import org.bytediff.print.fmt.AnsiColorFormatter;
 import org.bytediff.util.Raw;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.nio.ByteBuffer;
 
 public class UseCasesTest {
 
