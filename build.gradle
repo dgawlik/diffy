@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id "com.jfrog.bintray" version "1.8.4"
+    id "com.github.spotbugs" version "4.6.0"
 }
 
 group 'org.bytediff'
@@ -10,6 +11,15 @@ version '1.0-ALPHA'
 repositories {
     mavenCentral()
 }
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+tasks.withType(Test) {
+    systemProperty "file.encoding", "UTF-8"
+}
+
+
 
 bintray {
     user = System.getenv('BINTRAY_USER')
