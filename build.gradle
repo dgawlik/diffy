@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id "com.jfrog.bintray" version "1.8.4"
-    id "com.github.spotbugs" version "4.6.0"
+    id 'pmd'
 }
 
 group 'org.bytediff'
@@ -11,6 +11,7 @@ version '1.0-ALPHA'
 repositories {
     mavenCentral()
 }
+
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
@@ -89,6 +90,7 @@ publishing {
     }
 }
 
+
 bintray {
     user = System.getenv("BINTRAY_USER")
     key = System.getenv("BINTRAY_KEY")
@@ -105,5 +107,18 @@ javadoc {
     if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
+}
+
+pmd {
+    consoleOutput = true
+    ruleSets = [
+            "category/java/errorprone.xml",
+            "category/java/bestpractices.xml",
+            "category/java/bestpractices.xml",
+            "category/java/codestyle.xml",
+            "category/java/design.xml",
+            "category/java/documentation.xml",
+            "category/java/performance.xml",
+    ]
 }
 
