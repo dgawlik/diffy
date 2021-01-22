@@ -1,15 +1,13 @@
 package org.bytediff.engine;
 
-import javax.annotation.Nonnull;
-import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
+import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import org.bytediff.engine.DiffInfo.DiffType;
-import org.bytediff.meta.Internal;
 
 
 /**
@@ -19,10 +17,6 @@ import org.bytediff.meta.Internal;
  * character insertions or deletions taking sourceCP to targetCP.
  */
 @UtilityClass
-@SuppressWarnings({
-    "PMD.ShortClassName",
-    "PMD.UseVarargs"
-})
 public class Diff {
 
   /**
@@ -40,7 +34,6 @@ public class Diff {
    * Element of linked list containing all operations transforming source to
    * target.
    */
-  @SuppressWarnings({"PMD.CommentRequired", "PMD.DefaultPackage"})
   @NoArgsConstructor
   private static class EditNode {
 
@@ -71,7 +64,7 @@ public class Diff {
    *
    * @param source array compared against target
    * @param target source of truth array
-   * @return {@see DiffInfo}
+   * @return {@code DiffInfo}
    */
   public DiffInfo compute(@Nonnull final char[] source,
       @Nonnull final char[] target) {
@@ -81,7 +74,14 @@ public class Diff {
     return new DiffInfo(source, target, stage2Result);
   }
 
-  @SuppressWarnings("PMD.LawOfDemeter")
+  /**
+   * Adjusts offsets for surrogate pairs. If (high, low) surrogate is split
+   * between replace-match or match-replace range boundaries it shrinks match
+   * range by one and extends replace range by one.
+   *
+   * @param source array against which checks are made
+   * @param diffs  diffs to be adjusted
+   */
   private void enforceSurrogatePairs(@Nonnull final char[] source,
       @Nonnull final List<DiffInfo.Diff> diffs) {
     for (int i = 0; i < diffs.size() - 1; i++) {
@@ -110,6 +110,14 @@ public class Diff {
   }
 
 
+  /**
+   * It traverses the list and gathers insert, delete and match batches. On
+   * (insert, delete) it flushes match characters to one range, and on match it
+   * flushes either insert, or delete, or converts them to replace.
+   *
+   * @param editPath linked list containing ordered modifications on source
+   * @return
+   */
   private List<DiffInfo.Diff> computeInfo(
       @Nonnull final List<EditNode> editPath) {
 
@@ -145,7 +153,6 @@ public class Diff {
     return result;
   }
 
-  @SuppressWarnings({"PMD.LawOfDemeter", "PMD.LocalVariableCouldBeFinal"})
   private void onMatch(@Nonnull final List<EditNode> inserts,
       @Nonnull final List<EditNode> deletes,
       @Nonnull final List<DiffInfo.Diff> diffs) {
@@ -188,7 +195,6 @@ public class Diff {
     }
   }
 
-  @SuppressWarnings({"PMD.LawOfDemeter", "PMD.LocalVariableCouldBeFinal"})
   private void onInsertionOrDeletion(@Nonnull final List<EditNode> matches,
       final List<DiffInfo.Diff> diffs) {
     if (!matches.isEmpty()) {
@@ -204,6 +210,15 @@ public class Diff {
     }
   }
 
+  /**
+   * Construct grid of source x target modifications like in LCS. Go along the
+   * diagonal. For d steps along diagonal check all -d..d possible branches and
+   * pick minimal edit.
+   *
+   * @param source
+   * @param target
+   * @return
+   */
   @SuppressWarnings("PMD")
   private List<EditNode> computeEditPath(@Nonnull final char[] source,
       @Nonnull final char[] target) {

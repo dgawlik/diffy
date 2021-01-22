@@ -15,7 +15,6 @@ import org.bytediff.print.fmt.SymbolFormatter;
  * Displays representation of {@code DiffInfo}. It is configured by {@code
  * Encoder} and {@code Formatter}
  */
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public final class Printer {
 
   private final DiffInfo diff;

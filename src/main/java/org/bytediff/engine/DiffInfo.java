@@ -13,7 +13,6 @@ import org.bytediff.meta.Internal;
  * Wrapper around insert, delete, match and replace ranges along with target and
  * source arrays.
  */
-@SuppressWarnings("PMD.LawOfDemeter")
 public class DiffInfo {
 
   /**
