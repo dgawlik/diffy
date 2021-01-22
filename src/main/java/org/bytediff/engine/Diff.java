@@ -8,13 +8,14 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.bytediff.engine.DiffInfo.DiffType;
+import org.bytediff.meta.Internal;
 
 
 /**
- * Class that compares character arrays by {@code Diff.compute(sourceCP, targetCP)} method. It
- * implements Meyer's algorithm of O(ND) complexity, where N stands for {@code sourceCP.length +
- * targetCP.length} and D is a number of character insertions or deletions taking sourceCP to
- * targetCP.
+ * Class that compares character arrays by {@code Diff.compute(sourceCP,
+ * targetCP)} method. It implements Meyer's algorithm of O(ND) complexity, where
+ * N stands for {@code sourceCP.length + targetCP.length} and D is a number of
+ * character insertions or deletions taking sourceCP to targetCP.
  */
 @UtilityClass
 @SuppressWarnings({
@@ -24,8 +25,8 @@ import org.bytediff.engine.DiffInfo.DiffType;
 public class Diff {
 
   /**
-   * Comparison of char arrays produces linked list of transformations. {@code Op} describes the
-   * character of link.
+   * Comparison of char arrays produces linked list of transformations. {@code
+   * Op} describes the character of link.
    */
   private enum Op {
     INSERT, //addition of character to source
@@ -35,19 +36,20 @@ public class Diff {
   }
 
   /**
-   * Element of linked list containing all operations transforming source to target.
+   * Element of linked list containing all operations transforming source to
+   * target.
    */
   @SuppressWarnings("PMD.CommentRequired")
   @NoArgsConstructor
   private static class EditNode {
 
-    int sourceIndex;    //operation happening on source from this index inclusive
+    @Internal  int sourceIndex;    //operation happening on source from this index inclusive
 
-    int targetIndex;    //operation happening on source from this index inclusive
+    @Internal int targetIndex;    //operation happening on source from this index inclusive
 
-    EditNode parent;    //predecessor in linked list
+    @Internal EditNode parent;    //predecessor in linked list
 
-    Op operation;       //operation type see Diff.Op
+    @Internal Op operation;       //operation type see Diff.Op
 
     @Override
     public String toString() {
@@ -63,7 +65,8 @@ public class Diff {
 
 
   /**
-   * Calculates insert,delete,replace,match ranges and returns them wrapped in a structure.
+   * Calculates insert,delete,replace,match ranges and returns them wrapped in a
+   * structure.
    *
    * @param source array compared against target
    * @param target source of truth array
@@ -77,7 +80,8 @@ public class Diff {
   }
 
   @SuppressWarnings("PMD.LawOfDemeter")
-  private void enforceSurrogatePairs(final char[] source, final List<DiffInfo.Diff> diffs) {
+  private void enforceSurrogatePairs(final char[] source,
+      final List<DiffInfo.Diff> diffs) {
     for (int i = 0; i < diffs.size() - 1; i++) {
 
       final DiffInfo.Diff curr = diffs.get(i);
@@ -200,9 +204,11 @@ public class Diff {
   @SuppressWarnings({
       "PMD.LocalVariableCouldBeFinal",
       "PMD.ShortVariable",
-      "CyclomaticComplexity"
+      "PMD.CyclomaticComplexity",
+      "PMD.LocalVariableNamingConventions"
   })
-  private List<EditNode> computeEditPath(final char[] source, final char[] target) {
+  private List<EditNode> computeEditPath(final char[] source,
+      final char[] target) {
 
     int N = source.length;
     int M = target.length;
