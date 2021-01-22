@@ -56,6 +56,8 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.16'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 }
 
 test {
@@ -114,10 +116,8 @@ pmd {
     ruleSets = [
             "category/java/errorprone.xml",
             "category/java/bestpractices.xml",
-            "category/java/bestpractices.xml",
             "category/java/codestyle.xml",
             "category/java/design.xml",
-            "category/java/documentation.xml",
             "category/java/performance.xml",
     ]
 }

@@ -1,5 +1,7 @@
 package org.bytediff.print;
 
+import java.util.Arrays;
+import javax.annotation.Nonnull;
 import org.bytediff.engine.DiffInfo;
 import org.bytediff.engine.DiffInfo.Diff;
 import org.bytediff.engine.DiffInfo.DiffType;
@@ -9,9 +11,14 @@ import org.bytediff.print.fmt.Formatter;
 import org.bytediff.print.fmt.SymbolFormatter;
 
 
-public class Printer {
+/**
+ * Displays representation of {@code DiffInfo}. It is configured by {@code
+ * Encoder} and {@code Formatter}
+ */
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
+public final class Printer {
 
-  private DiffInfo info;
+  private final DiffInfo diff;
   private boolean isCompact;
   private Formatter fmt;
   private Encoder enc;
@@ -19,8 +26,8 @@ public class Printer {
   private int contextRight;
 
 
-  private Printer(DiffInfo info) {
-    this.info = info;
+  private Printer(@Nonnull final DiffInfo diff) {
+    this.diff = diff;
     this.isCompact = true;
     this.fmt = new SymbolFormatter();
     this.contextLeft = 5;
@@ -29,65 +36,78 @@ public class Printer {
   }
 
   public String print() {
-    String sourceS = new String(this.info.getSource());
-    String targetS = new String(this.info.getTarget());
-
-    StringBuilder sb = new StringBuilder();
-
-    if (this.info.getDiff().size() == 1
-        && this.info.getDiff().get(0).getDiffType() == DiffType.MATCH) {
+    if (this.diff.getDiff().size() == 1
+        && this.diff.getDiff().get(0).getDiffType() == DiffType.MATCH) {
       return "Identical.";
     }
 
-    for (Diff el : this.info.getDiff()) {
+    char[] source = this.diff.getSource();
+    char[] target = this.diff.getTarget();
+
+    StringBuilder sb = new StringBuilder();
+
+    for (Diff diffElement : this.diff.getDiff()) {
       if (this.isCompact) {
         int start, end;
-        String s;
-        if (el.getDiffType() == DiffType.REPLACE
-            || el.getDiffType() == DiffType.INSERT) {
-          start = el.getTargetStart();
-          end = el.getTargetEnd() + 1;
-          s = targetS;
+        char[] s;
+        if (diffElement.getDiffType() == DiffType.REPLACE
+            || diffElement.getDiffType() == DiffType.INSERT) {
+          start = diffElement.getTargetStart();
+          end = diffElement.getTargetEnd() + 1;
+          s = target;
         } else {
-          start = el.getSourceStart();
-          end = el.getSourceEnd() + 1;
-          s = sourceS;
+          start = diffElement.getSourceStart();
+          end = diffElement.getSourceEnd() + 1;
+          s = source;
         }
 
-        sb.append(fmt.format(enc.encode(s.substring(start, end)), el.getDiffType()));
+        sb.append(
+            fmt.format(
+                enc.encode(
+                    newSlice(start, end, s)),
+                diffElement.getDiffType()));
       } else {
-        if (el.getDiffType() == DiffType.MATCH) {
+        if (diffElement.getDiffType() == DiffType.MATCH) {
           continue;
         }
 
-        int start = el.getSourceStart();
-        int end = el.getSourceEnd() + 1;
+        int start = diffElement.getSourceStart();
+        int end = diffElement.getSourceEnd() + 1;
 
         int contextLeftStart = Math.max(0, start - this.contextLeft);
         int contextLeftEnd = start;
-        int contextRightStart = Math.min(end + 1, sourceS.length());
-        int contextRightEnd = Math.min(end + contextRight, sourceS.length());
+        int contextRightStart = Math.min(end + 1, source.length);
+        int contextRightEnd = Math.min(end + contextRight, source.length);
 
         String diff;
-        if (el.getDiffType() == DiffType.REPLACE
-            || el.getDiffType() == DiffType.INSERT) {
-          diff = fmt.format(enc.encode(targetS.substring(
-              el.getTargetStart(), el.getTargetEnd() + 1)), el.getDiffType());
+        if (diffElement.getDiffType() == DiffType.REPLACE
+            || diffElement.getDiffType() == DiffType.INSERT) {
+          diff = fmt.format(
+              enc.encode(newSlice(diffElement.getTargetStart(),
+                  diffElement.getTargetEnd() + 1, target)),
+              diffElement.getDiffType());
         } else {
-          diff = fmt.format(enc.encode(sourceS.substring(start, end)), el.getDiffType());
+          diff = fmt.format(
+              enc.encode(
+                  newSlice(start, end, source)),
+              diffElement.getDiffType());
         }
 
         String line = "*> "
             + (contextLeftStart == contextLeftEnd
-            ? "" : "..." + sourceS.substring(contextLeftStart, contextLeftEnd))
+            ? "" : "..." + newSlice(contextLeftStart, contextLeftEnd, source))
             + diff
             + (contextRightStart == contextRightEnd
-            ? "" : sourceS.substring(contextRightStart, contextRightEnd) + "...")
+            ? "" : newSlice(contextRightStart, contextRightEnd, source) + "...")
             + "\n";
         sb.append(line);
       }
     }
     return sb.toString();
+  }
+
+  private String newSlice(int start, int end, char[] s) {
+    return new String(Arrays.copyOfRange(s, start, end));
   }
 
   public static Printer from(DiffInfo info) {

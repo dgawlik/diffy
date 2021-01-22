@@ -4,23 +4,40 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bytediff.meta.Internal;
 
 /**
  * Wrapper around insert, delete, match and replace ranges along with target and
  * source arrays.
  */
+@SuppressWarnings("PMD.LawOfDemeter")
 public class DiffInfo {
 
+  /**
+   * Diff ranges
+   */
   @Getter
   private final List<Diff> diff;
+
+  /**
+   * Copy of source array
+   */
   @Getter
   private final char[] source;
+
+  /**
+   * Copy of target array
+   */
   @Getter
   private final char[] target;
 
 
+  /**
+   * Diff element type
+   */
   public enum DiffType {
     INSERT, DELETE, REPLACE, MATCH;
   }
@@ -32,22 +49,24 @@ public class DiffInfo {
   public static class Diff {
 
     @Getter
-    DiffType diffType;
+    /* internal */ DiffType diffType;
 
     @Getter
-    Integer sourceStart;
+    /* internal */ Integer sourceStart;
 
     @Getter
-    Integer sourceEnd;
+    /* internal */ Integer sourceEnd;
 
     @Getter
-    Integer targetStart;
+    /* internal */ Integer targetStart;
 
     @Getter
-    Integer targetEnd;
+    /* internal */ Integer targetEnd;
   }
 
-  DiffInfo(final char[] source, final char[] target, final List<Diff> diff) {
+  DiffInfo(@Nonnull final char[] source,
+      @Nonnull final char[] target,
+      @Nonnull final List<Diff> diff) {
     this.source = Arrays.copyOf(source, source.length);
     this.target = Arrays.copyOf(target, target.length);
     this.diff = diff;

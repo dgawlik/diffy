@@ -6,19 +6,25 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import javax.annotation.Nonnull;
 
+
+/**
+ * Utility charset that id converts byte array to char arrray
+ */
 public class IdCharset extends Charset {
 
   public static class IdEncoder extends CharsetEncoder {
 
-    public IdEncoder(Charset cs) {
-      super(cs, 1, 1, new byte[]{(byte) '?'});
+    public IdEncoder(Charset charset) {
+      super(charset, 1, 1, new byte[]{(byte) '?'});
     }
 
     @Override
-    protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out) {
-      while (in.hasRemaining()) {
-        out.put((byte) in.get());
+    protected CoderResult encodeLoop(@Nonnull final CharBuffer inputBuffer,
+        @Nonnull final ByteBuffer outputBuffer) {
+      while (inputBuffer.hasRemaining()) {
+        outputBuffer.put((byte) inputBuffer.get());
       }
       return CoderResult.UNDERFLOW;
     }
@@ -26,14 +32,15 @@ public class IdCharset extends Charset {
 
   public static class IdDecoder extends CharsetDecoder {
 
-    protected IdDecoder(Charset cs) {
-      super(cs, 1, 1);
+    protected IdDecoder(Charset charset) {
+      super(charset, 1, 1);
     }
 
     @Override
-    protected CoderResult decodeLoop(ByteBuffer in, CharBuffer out) {
-      while (in.hasRemaining()) {
-        out.put((char) in.get());
+    protected CoderResult decodeLoop(@Nonnull final ByteBuffer inputBuffer,
+        @Nonnull final CharBuffer outputBuffer) {
+      while (inputBuffer.hasRemaining()) {
+        outputBuffer.put((char) inputBuffer.get());
       }
       return CoderResult.UNDERFLOW;
     }
@@ -44,7 +51,7 @@ public class IdCharset extends Charset {
   }
 
   @Override
-  public boolean contains(Charset cs) {
+  public boolean contains(Charset charset) {
     return false;
   }
 

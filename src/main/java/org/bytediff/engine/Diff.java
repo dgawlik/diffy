@@ -1,5 +1,6 @@
 package org.bytediff.engine;
 
+import javax.annotation.Nonnull;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 
@@ -39,17 +40,17 @@ public class Diff {
    * Element of linked list containing all operations transforming source to
    * target.
    */
-  @SuppressWarnings("PMD.CommentRequired")
+  @SuppressWarnings({"PMD.CommentRequired", "PMD.DefaultPackage"})
   @NoArgsConstructor
   private static class EditNode {
 
-    @Internal  int sourceIndex;    //operation happening on source from this index inclusive
+    /* internal */ int sourceIndex;
 
-    @Internal int targetIndex;    //operation happening on source from this index inclusive
+    /* internal */ int targetIndex;
 
-    @Internal EditNode parent;    //predecessor in linked list
+    /* internal */ EditNode parent;
 
-    @Internal Op operation;       //operation type see Diff.Op
+    /* internal */ Op operation;
 
     @Override
     public String toString() {
@@ -72,7 +73,8 @@ public class Diff {
    * @param target source of truth array
    * @return {@see DiffInfo}
    */
-  public DiffInfo compute(final char[] source, final char[] target) {
+  public DiffInfo compute(@Nonnull final char[] source,
+      @Nonnull final char[] target) {
     final List<EditNode> stage1Result = computeEditPath(source, target);
     final List<DiffInfo.Diff> stage2Result = computeInfo(stage1Result);
     enforceSurrogatePairs(source, stage2Result);
@@ -80,8 +82,8 @@ public class Diff {
   }
 
   @SuppressWarnings("PMD.LawOfDemeter")
-  private void enforceSurrogatePairs(final char[] source,
-      final List<DiffInfo.Diff> diffs) {
+  private void enforceSurrogatePairs(@Nonnull final char[] source,
+      @Nonnull final List<DiffInfo.Diff> diffs) {
     for (int i = 0; i < diffs.size() - 1; i++) {
 
       final DiffInfo.Diff curr = diffs.get(i);
@@ -108,7 +110,8 @@ public class Diff {
   }
 
 
-  private List<DiffInfo.Diff> computeInfo(final List<EditNode> editPath) {
+  private List<DiffInfo.Diff> computeInfo(
+      @Nonnull final List<EditNode> editPath) {
 
     final List<EditNode> inserts = new ArrayList<>();
     final List<EditNode> deletes = new ArrayList<>();
@@ -143,9 +146,9 @@ public class Diff {
   }
 
   @SuppressWarnings({"PMD.LawOfDemeter", "PMD.LocalVariableCouldBeFinal"})
-  private void onMatch(final List<EditNode> inserts,
-      final List<EditNode> deletes,
-      final List<DiffInfo.Diff> diffs) {
+  private void onMatch(@Nonnull final List<EditNode> inserts,
+      @Nonnull final List<EditNode> deletes,
+      @Nonnull final List<DiffInfo.Diff> diffs) {
 
     int isize = inserts.size();
     int dsize = deletes.size();
@@ -186,7 +189,7 @@ public class Diff {
   }
 
   @SuppressWarnings({"PMD.LawOfDemeter", "PMD.LocalVariableCouldBeFinal"})
-  private void onInsertionOrDeletion(final List<EditNode> matches,
+  private void onInsertionOrDeletion(@Nonnull final List<EditNode> matches,
       final List<DiffInfo.Diff> diffs) {
     if (!matches.isEmpty()) {
       int start = matches.get(0).sourceIndex;
@@ -201,14 +204,9 @@ public class Diff {
     }
   }
 
-  @SuppressWarnings({
-      "PMD.LocalVariableCouldBeFinal",
-      "PMD.ShortVariable",
-      "PMD.CyclomaticComplexity",
-      "PMD.LocalVariableNamingConventions"
-  })
-  private List<EditNode> computeEditPath(final char[] source,
-      final char[] target) {
+  @SuppressWarnings("PMD")
+  private List<EditNode> computeEditPath(@Nonnull final char[] source,
+      @Nonnull final char[] target) {
 
     int N = source.length;
     int M = target.length;
