@@ -1,51 +1,52 @@
 package org.bytediff.engine;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Value;
+import lombok.*;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DiffInfo {
+
     public enum InfoType {
         INSERT, DELETE, REPLACE, MATCH;
     }
 
-    @Data
     @AllArgsConstructor
     public static class Info {
+        @Getter
+        @Setter(AccessLevel.PACKAGE)
         private InfoType infoType;
+
+        @Getter
+        @Setter(AccessLevel.PACKAGE)
         private Integer sourceStart;
+
+        @Getter
+        @Setter(AccessLevel.PACKAGE)
         private Integer sourceEnd;
+
+        @Getter
+        @Setter(AccessLevel.PACKAGE)
         private Integer targetStart;
+
+        @Getter
+        @Setter(AccessLevel.PACKAGE)
         private Integer targetEnd;
     }
 
-    private final List<Info> info;
-    private final char[] source;
-    private final char[] target;
+    @Getter private final List<Info> info;
+    @Getter private final char[] source;
+    @Getter private final char[] target;
 
-    public DiffInfo(char[] source, char[] target) {
+    DiffInfo(char[] source, char[] target, List<Info> info) {
         this.source = source;
         this.target = target;
-        this.info = new ArrayList<>();
-    }
-
-    public List<Info> getInfo() {
-        return this.info;
-    }
-
-    public char[] getSource() {
-        return this.source;
-    }
-
-    public char[] getTarget() {
-        return this.target;
+        this.info = info;
     }
 
     public List<String> getInserts() {
