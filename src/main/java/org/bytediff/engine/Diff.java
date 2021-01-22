@@ -112,7 +112,7 @@ public class Diff {
 
         final List<DiffInfo.Info> result = new ArrayList<>();
 
-        final List<EditNode> trimmedPath =  path.subList(2, path.size());
+        final List<EditNode> trimmedPath = path.subList(2, path.size());
 
         for (final EditNode node : trimmedPath) {
             Op op = node.getOperation();
@@ -138,14 +138,16 @@ public class Diff {
         return result;
     }
 
-    private void onMatch(List<EditNode> inserts, List<EditNode> deletes, List<DiffInfo.Info> lst) {
-        if (!inserts.isEmpty() && !deletes.isEmpty()
+    private void onMatch(final List<EditNode> inserts,
+                         final List<EditNode> deletes,
+                         final List<DiffInfo.Info> lst) {
+        if (inserts.size() > 0 && deletes.size() > 0
                 && inserts.size() == deletes.size()) {
 
-            int start = deletes.get(0).getSourceIndex();
-            int end = deletes.get(deletes.size() - 1).getSourceIndex();
-            int startTarget = inserts.get(0).getTargetIndex();
-            int endTarget = inserts.get(inserts.size() - 1).getTargetIndex();
+            int start = deletes.get(0).sourceIndex;
+            int end = deletes.get(deletes.size() - 1).sourceIndex;
+            int startTarget = inserts.get(0).targetIndex;
+            int endTarget = inserts.get(inserts.size() - 1).targetIndex;
 
             DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.REPLACE, start, end,
                     startTarget, endTarget);
@@ -153,17 +155,17 @@ public class Diff {
 
             inserts.clear();
             deletes.clear();
-        } else if (!inserts.isEmpty()) {
-            int start = inserts.get(0).getSourceIndex();
-            int end = inserts.get(inserts.size() - 1).getSourceIndex();
-            int startTarget = inserts.get(0).getTargetIndex();
-            int endTarget = inserts.get(inserts.size() - 1).getTargetIndex();
+        } else if (inserts.size() > 0) {
+            int start = inserts.get(0).sourceIndex;
+            int end = inserts.get(inserts.size() - 1).sourceIndex;
+            int startTarget = inserts.get(0).targetIndex;
+            int endTarget = inserts.get(inserts.size() - 1).targetIndex;
 
             DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.INSERT, start, end,
                     startTarget, endTarget);
             lst.add(info);
             inserts.clear();
-        } else if (!deletes.isEmpty()) {
+        } else if (deletes.size() > 0) {
             int start = deletes.get(0).getSourceIndex();
             int end = deletes.get(deletes.size() - 1).getSourceIndex();
             int before = deletes.get(0).getTargetIndex();
@@ -177,10 +179,10 @@ public class Diff {
 
     private void onInsertionOrDeletion(List<EditNode> matches, List<DiffInfo.Info> lst) {
         if (!matches.isEmpty()) {
-            int start = matches.get(0).getSourceIndex();
-            int end = matches.get(matches.size() - 1).getSourceIndex();
-            int startTarget = matches.get(0).getTargetIndex();
-            int endTarget = matches.get(matches.size() - 1).getTargetIndex();
+            int start = matches.get(0).sourceIndex;
+            int end = matches.get(matches.size() - 1).sourceIndex;
+            int startTarget = matches.get(0).targetIndex;
+            int endTarget = matches.get(matches.size() - 1).targetIndex;
 
             DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.MATCH, start,
                     end, startTarget, endTarget);
@@ -189,12 +191,12 @@ public class Diff {
         }
     }
 
-    private List<EditNode> computeEditPath(char[] sourceCP, char[] targetCP) {
+    private List<EditNode> computeEditPath(final char[] source, final char[] target) {
 
-        int N = sourceCP.length;
-        int M = targetCP.length;
-        int maxD = N + M;
-        int middleV = maxD;
+        final int N = source.length;
+        final int M = target.length;
+        final int maxD = N + M;
+        final int middleV = maxD;
 
         int[] V = new int[2 * maxD + 2];
         Arrays.fill(V, -1);
@@ -229,7 +231,7 @@ public class Diff {
                 currentN.setSourceIndex(x - 1);
                 currentN.setParent(prevN);
                 currentN.setTargetIndex(y - 1);
-                while (x < N && y < M && sourceCP[x] == targetCP[y]) {
+                while (x < N && y < M && source[x] == target[y]) {
 
                     x++;
                     y++;

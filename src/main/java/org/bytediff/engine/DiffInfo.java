@@ -1,16 +1,21 @@
 package org.bytediff.engine;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DiffInfo {
+
+    @Getter
+    private final List<Info> info;
+    @Getter
+    private final char[] source;
+    @Getter
+    private final char[] target;
 
     public enum InfoType {
         INSERT, DELETE, REPLACE, MATCH;
@@ -34,11 +39,7 @@ public class DiffInfo {
         Integer targetEnd;
     }
 
-    @Getter private final List<Info> info;
-    @Getter private final char[] source;
-    @Getter private final char[] target;
-
-    DiffInfo(char[] source, char[] target, List<Info> info) {
+    DiffInfo(final char[] source, final char[] target, final List<Info> info) {
         this.source = source;
         this.target = target;
         this.info = info;
@@ -46,25 +47,25 @@ public class DiffInfo {
 
     public List<String> getInserts() {
         return info.stream().filter(byType(InfoType.INSERT))
-                .map(o -> constructString(target, o.getTargetStart(), o.getTargetEnd()))
+                .map(o -> constructString(target, o.targetStart, o.targetEnd))
                 .collect(Collectors.toList());
     }
 
     public List<String> getDeletions() {
         return info.stream().filter(byType(InfoType.DELETE))
-                .map(o -> constructString(source, o.getSourceStart(), o.getSourceEnd()))
+                .map(o -> constructString(source, o.sourceStart, o.sourceEnd))
                 .collect(Collectors.toList());
     }
 
     public List<String> getReplacements() {
         return info.stream().filter(byType(InfoType.REPLACE))
-                .map(o -> constructString(target, o.getTargetStart(), o.getTargetEnd()))
+                .map(o -> constructString(target, o.targetStart, o.targetEnd))
                 .collect(Collectors.toList());
     }
 
     public List<String> getMatches() {
         return info.stream().filter(byType(InfoType.MATCH))
-                .map(o -> constructString(source, o.getSourceStart(), o.getSourceEnd()))
+                .map(o -> constructString(source, o.sourceStart, o.sourceEnd))
                 .collect(Collectors.toList());
     }
 
@@ -90,26 +91,6 @@ public class DiffInfo {
         return info.stream().filter(byType(InfoType.MATCH))
                 .map(Info::getSourceStart)
                 .collect(Collectors.toList());
-    }
-
-    void addInsertion(int start, int end, int targetStart, int targetEnd) {
-        info.add(
-                new Info(InfoType.INSERT, start, end, targetStart, targetEnd));
-    }
-
-    void addDeletion(int start, int end, int before) {
-        info.add(
-                new Info(InfoType.DELETE, start, end, before, before));
-    }
-
-    void addReplacement(int start, int end, int targetStart, int targetEnd) {
-        info.add(
-                new Info(InfoType.REPLACE, start, end, targetStart, targetEnd));
-    }
-
-    void addMatch(int start, int end, int targetStart, int targetEnd) {
-        info.add(
-                new Info(InfoType.MATCH, start, end, targetStart, targetEnd));
     }
 
     private Predicate<Info> byType(InfoType type) {
