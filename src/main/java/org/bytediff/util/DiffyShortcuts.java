@@ -3,6 +3,7 @@ package org.bytediff.util;
 
 import org.bytediff.engine.Diff;
 import org.bytediff.engine.DiffInfo;
+import org.bytediff.engine.DiffInfo.DiffType;
 import org.bytediff.print.Printer;
 import org.bytediff.print.enc.RawValueEncoder;
 import org.bytediff.print.fmt.AnsiColorFormatter;
@@ -62,8 +63,8 @@ public class DiffyShortcuts {
   public static void assertEquals(String source, String target) {
     DiffInfo info = Diff.compute(source.toCharArray(), target.toCharArray());
 
-    if (info.getInfo().size() == 1
-        && info.getInfo().get(0).getInfoType() == DiffInfo.InfoType.MATCH) {
+    if (info.getDiff().size() == 1
+        && info.getDiff().get(0).getDiffType() == DiffType.MATCH) {
       return;
     }
 
@@ -76,8 +77,8 @@ public class DiffyShortcuts {
     char[] targetC = Raw.bytesToChars(target);
     DiffInfo info = Diff.compute(sourceC, targetC);
 
-    if (info.getInfo().size() == 1
-        && info.getInfo().get(0).getInfoType() == DiffInfo.InfoType.MATCH) {
+    if (info.getDiff().size() == 1
+        && info.getDiff().get(0).getDiffType() == DiffType.MATCH) {
       return;
     }
 

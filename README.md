@@ -38,8 +38,8 @@ Diffed string is displayed as line with modifications.
 char[] source="jooohnbb".toCharArray();
 char[] target="johnaa".toCharArray();
 
-DiffInfo info=Diff.compute(source,target);
-Printer p=Printer.from(info);
+DiffInfo diff=Diff.compute(source,target);
+Printer p=Printer.from(diff);
 System.out.println(p.print());
 ```
 
@@ -57,8 +57,8 @@ Each modification broken down to single line with configurable context.
 char[] source="jooohnbb".toCharArray();
 char[] target="johnaa".toCharArray();
 
-DiffInfo info=Diff.compute(source,target);
-Printer p=Printer.from(info).verbose();
+DiffInfo diff=Diff.compute(source,target);
+Printer p=Printer.from(diff).verbose();
 System.out.println(p.print());
 ```
 
@@ -77,8 +77,8 @@ Using ANSI terminal escape characters to display colorful background.
 char[] source="jooohnbb".toCharArray();
 char[] target="johnaa".toCharArray();
 
-DiffInfo info=Diff.compute(source,target);
-Printer p=Printer.from(info).withFormatter(new AnsiColorFormatter());
+DiffInfo diff=Diff.compute(source,target);
+Printer p=Printer.from(diff).withFormatter(new AnsiColorFormatter());
 System.out.println(p.print());
 ```
 
@@ -93,9 +93,9 @@ byte[] target=new byte[]{4,2,3};
 char[] sourceC=Raw.bytesToChars(source);
 char[] targetC=Raw.bytesToChars(target);
 
-DiffInfo info=Diff.compute(sourceC,targetC);
+DiffInfo diff=Diff.compute(sourceC,targetC);
 Printer p=Printer
-    .from(info)
+    .from(diff)
     .withEncoding(new RawValueEncoder(10));
 System.out.println(p.print());
 ```

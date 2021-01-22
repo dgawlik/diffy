@@ -1,8 +1,8 @@
 package org.bytediff.print.fmt;
 
-import org.bytediff.engine.DiffInfo;
+import org.bytediff.engine.DiffInfo.DiffType;
 
 public interface Formatter {
 
-  String format(String value, DiffInfo.InfoType type);
+  String format(String value, DiffType type);
 }

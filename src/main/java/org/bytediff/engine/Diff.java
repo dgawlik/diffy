@@ -1,12 +1,13 @@
 package org.bytediff.engine;
 
-import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import org.bytediff.engine.DiffInfo.DiffType;
 
 
 /**
@@ -36,17 +37,17 @@ public class Diff {
   /**
    * Element of linked list containing all operations transforming source to target.
    */
-  @Data
   @SuppressWarnings("PMD.CommentRequired")
+  @NoArgsConstructor
   private static class EditNode {
 
-    private int sourceIndex;    //operation happening on source from this index inclusive
+    int sourceIndex;    //operation happening on source from this index inclusive
 
-    private int targetIndex;    //operation happening on source from this index inclusive
+    int targetIndex;    //operation happening on source from this index inclusive
 
-    private EditNode parent;    //predecessor in linked list
+    EditNode parent;    //predecessor in linked list
 
-    private Op operation;       //operation type see Diff.Op
+    Op operation;       //operation type see Diff.Op
 
     @Override
     public String toString() {
@@ -70,29 +71,29 @@ public class Diff {
    */
   public DiffInfo compute(final char[] source, final char[] target) {
     final List<EditNode> stage1Result = computeEditPath(source, target);
-    final List<DiffInfo.Info> stage2Result = computeInfo(stage1Result);
+    final List<DiffInfo.Diff> stage2Result = computeInfo(stage1Result);
     enforceSurrogatePairs(source, stage2Result);
     return new DiffInfo(source, target, stage2Result);
   }
 
-  private void enforceSurrogatePairs(char[] source, List<DiffInfo.Info> lst) {
-    for (int i = 0; i < lst.size() - 1; i++) {
+  @SuppressWarnings("PMD.LawOfDemeter")
+  private void enforceSurrogatePairs(final char[] source, final List<DiffInfo.Diff> diffs) {
+    for (int i = 0; i < diffs.size() - 1; i++) {
 
-      final DiffInfo.Info curr = lst.get(i);
-      final DiffInfo.Info next = lst.get(i + 1);
+      final DiffInfo.Diff curr = diffs.get(i);
+      final DiffInfo.Diff next = diffs.get(i + 1);
 
       final int idx = curr.getSourceEnd();
       final char candidate = idx >= 0 ? source[curr.getSourceEnd()] : (char) -1;
       if (Character.isHighSurrogate(candidate)) {
-        if (curr.getInfoType() == DiffInfo.InfoType.MATCH
-            && next.getInfoType() == DiffInfo.InfoType.REPLACE) {
+        if (curr.getDiffType() == DiffType.MATCH
+            && next.getDiffType() == DiffType.REPLACE) {
           curr.sourceEnd = curr.sourceEnd - 1;
           next.sourceStart = next.sourceStart - 1;
           curr.targetEnd = curr.targetEnd - 1;
           next.targetStart = next.targetStart - 1;
-        }
-        if (curr.getInfoType() == DiffInfo.InfoType.REPLACE
-            && next.getInfoType() == DiffInfo.InfoType.MATCH) {
+        } else if (curr.getDiffType() == DiffType.REPLACE
+            && next.getDiffType() == DiffType.MATCH) {
           curr.sourceEnd = curr.sourceEnd + 1;
           next.sourceStart = next.sourceStart + 1;
           curr.targetEnd = curr.targetEnd + 1;
@@ -103,30 +104,30 @@ public class Diff {
   }
 
 
-  private List<DiffInfo.Info> computeInfo(List<EditNode> path) {
+  private List<DiffInfo.Diff> computeInfo(final List<EditNode> editPath) {
 
     final List<EditNode> inserts = new ArrayList<>();
     final List<EditNode> deletes = new ArrayList<>();
     final List<EditNode> matches = new ArrayList<>();
 
-    final List<DiffInfo.Info> result = new ArrayList<>();
+    final List<DiffInfo.Diff> result = new ArrayList<>();
 
-    final List<EditNode> trimmedPath = path.subList(2, path.size());
+    final List<EditNode> trimmedPath = editPath.subList(2, editPath.size());
 
     for (final EditNode node : trimmedPath) {
-      Op op = node.getOperation();
+      Op operation = node.operation;
 
-      if (op == Op.INSERT || op == Op.DELETE) {
-        if (op == Op.INSERT) {
+      if (operation == Op.INSERT || operation == Op.DELETE) {
+        if (operation == Op.INSERT) {
           inserts.add(node);
         }
-        if (op == Op.DELETE) {
+        if (operation == Op.DELETE) {
           deletes.add(node);
         }
         onInsertionOrDeletion(matches, result);
       }
 
-      if (op == Op.MATCH) {
+      if (operation == Op.MATCH) {
         matches.add(node);
         onMatch(inserts, deletes, result);
       }
@@ -137,65 +138,76 @@ public class Diff {
     return result;
   }
 
+  @SuppressWarnings({"PMD.LawOfDemeter", "PMD.LocalVariableCouldBeFinal"})
   private void onMatch(final List<EditNode> inserts,
       final List<EditNode> deletes,
-      final List<DiffInfo.Info> lst) {
-    if (inserts.size() > 0 && deletes.size() > 0
-        && inserts.size() == deletes.size()) {
+      final List<DiffInfo.Diff> diffs) {
+
+    int isize = inserts.size();
+    int dsize = deletes.size();
+
+    if (isize == dsize && isize > 0) {
 
       int start = deletes.get(0).sourceIndex;
       int end = deletes.get(deletes.size() - 1).sourceIndex;
       int startTarget = inserts.get(0).targetIndex;
       int endTarget = inserts.get(inserts.size() - 1).targetIndex;
 
-      DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.REPLACE, start, end,
+      final DiffInfo.Diff diff = new DiffInfo.Diff(DiffType.REPLACE, start, end,
           startTarget, endTarget);
-      lst.add(info);
+      diffs.add(diff);
 
       inserts.clear();
       deletes.clear();
-    } else if (inserts.size() > 0) {
+    } else if (isize > 0) {
       int start = inserts.get(0).sourceIndex;
       int end = inserts.get(inserts.size() - 1).sourceIndex;
       int startTarget = inserts.get(0).targetIndex;
       int endTarget = inserts.get(inserts.size() - 1).targetIndex;
 
-      DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.INSERT, start, end,
+      final DiffInfo.Diff diff = new DiffInfo.Diff(DiffType.INSERT, start, end,
           startTarget, endTarget);
-      lst.add(info);
+      diffs.add(diff);
       inserts.clear();
-    } else if (deletes.size() > 0) {
-      int start = deletes.get(0).getSourceIndex();
-      int end = deletes.get(deletes.size() - 1).getSourceIndex();
-      int before = deletes.get(0).getTargetIndex();
+    } else if (dsize > 0) {
+      int start = deletes.get(0).sourceIndex;
+      int end = deletes.get(deletes.size() - 1).sourceIndex;
+      int before = deletes.get(0).targetIndex;
 
-      DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.DELETE, start,
+      final DiffInfo.Diff diff = new DiffInfo.Diff(DiffType.DELETE, start,
           end, before, before);
-      lst.add(info);
+      diffs.add(diff);
       deletes.clear();
     }
   }
 
-  private void onInsertionOrDeletion(List<EditNode> matches, List<DiffInfo.Info> lst) {
+  @SuppressWarnings({"PMD.LawOfDemeter", "PMD.LocalVariableCouldBeFinal"})
+  private void onInsertionOrDeletion(final List<EditNode> matches,
+      final List<DiffInfo.Diff> diffs) {
     if (!matches.isEmpty()) {
       int start = matches.get(0).sourceIndex;
       int end = matches.get(matches.size() - 1).sourceIndex;
       int startTarget = matches.get(0).targetIndex;
       int endTarget = matches.get(matches.size() - 1).targetIndex;
 
-      DiffInfo.Info info = new DiffInfo.Info(DiffInfo.InfoType.MATCH, start,
+      final DiffInfo.Diff diff = new DiffInfo.Diff(DiffType.MATCH, start,
           end, startTarget, endTarget);
-      lst.add(info);
+      diffs.add(diff);
       matches.clear();
     }
   }
 
+  @SuppressWarnings({
+      "PMD.LocalVariableCouldBeFinal",
+      "PMD.ShortVariable",
+      "CyclomaticComplexity"
+  })
   private List<EditNode> computeEditPath(final char[] source, final char[] target) {
 
-    final int N = source.length;
-    final int M = target.length;
-    final int maxD = N + M;
-    final int middleV = maxD;
+    int N = source.length;
+    int M = target.length;
+    int maxD = N + M;
+    int middleV = maxD;
 
     int[] V = new int[2 * maxD + 2];
     Arrays.fill(V, -1);
@@ -203,9 +215,9 @@ public class Diff {
 
     EditNode[] Vnodes = new EditNode[2 * maxD + 2];
     EditNode sourceN = new EditNode();
-    sourceN.setSourceIndex(-1);
-    sourceN.setTargetIndex(-1);
-    sourceN.setOperation(Op.SOURCE);
+    sourceN.sourceIndex = -1;
+    sourceN.targetIndex = -1;
+    sourceN.operation = Op.SOURCE;
     Vnodes[middleV + 1] = sourceN;
 
     for (int D = 0; D < maxD; D++) {
@@ -219,25 +231,25 @@ public class Diff {
 
           x = V[middleV + k + 1];
           prevN = Vnodes[middleV + k + 1];
-          currentN.setOperation(Op.INSERT);
+          currentN.operation = Op.INSERT;
         } else {
           x = V[middleV + k - 1] + 1;
           prevN = Vnodes[middleV + k - 1];
-          currentN.setOperation(Op.DELETE);
+          currentN.operation = Op.DELETE;
         }
         int y = x - k;
-        currentN.setSourceIndex(x - 1);
-        currentN.setParent(prevN);
-        currentN.setTargetIndex(y - 1);
+        currentN.sourceIndex = x - 1;
+        currentN.parent = prevN;
+        currentN.targetIndex = y - 1;
         while (x < N && y < M && source[x] == target[y]) {
 
           x++;
           y++;
           EditNode nextN = new EditNode();
-          nextN.setSourceIndex(x - 1);
-          nextN.setTargetIndex(y - 1);
-          nextN.setParent(currentN);
-          nextN.setOperation(Op.MATCH);
+          nextN.sourceIndex = x - 1;
+          nextN.targetIndex = y - 1;
+          nextN.parent = currentN;
+          nextN.operation = Op.MATCH;
           currentN = nextN;
         }
 
@@ -249,7 +261,7 @@ public class Diff {
           EditNode it = currentN;
           while (it != null) {
             path.offerFirst(it);
-            it = it.getParent();
+            it = it.parent;
           }
           return path;
         }

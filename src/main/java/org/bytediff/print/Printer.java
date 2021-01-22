@@ -1,6 +1,8 @@
 package org.bytediff.print;
 
 import org.bytediff.engine.DiffInfo;
+import org.bytediff.engine.DiffInfo.Diff;
+import org.bytediff.engine.DiffInfo.DiffType;
 import org.bytediff.print.enc.Encoder;
 import org.bytediff.print.enc.IdEncoder;
 import org.bytediff.print.fmt.Formatter;
@@ -32,17 +34,17 @@ public class Printer {
 
     StringBuilder sb = new StringBuilder();
 
-    if (this.info.getInfo().size() == 1
-        && this.info.getInfo().get(0).getInfoType() == DiffInfo.InfoType.MATCH) {
+    if (this.info.getDiff().size() == 1
+        && this.info.getDiff().get(0).getDiffType() == DiffType.MATCH) {
       return "Identical.";
     }
 
-    for (DiffInfo.Info el : this.info.getInfo()) {
+    for (Diff el : this.info.getDiff()) {
       if (this.isCompact) {
         int start, end;
         String s;
-        if (el.getInfoType() == DiffInfo.InfoType.REPLACE
-            || el.getInfoType() == DiffInfo.InfoType.INSERT) {
+        if (el.getDiffType() == DiffType.REPLACE
+            || el.getDiffType() == DiffType.INSERT) {
           start = el.getTargetStart();
           end = el.getTargetEnd() + 1;
           s = targetS;
@@ -52,9 +54,9 @@ public class Printer {
           s = sourceS;
         }
 
-        sb.append(fmt.format(enc.encode(s.substring(start, end)), el.getInfoType()));
+        sb.append(fmt.format(enc.encode(s.substring(start, end)), el.getDiffType()));
       } else {
-        if (el.getInfoType() == DiffInfo.InfoType.MATCH) {
+        if (el.getDiffType() == DiffType.MATCH) {
           continue;
         }
 
@@ -67,12 +69,12 @@ public class Printer {
         int contextRightEnd = Math.min(end + contextRight, sourceS.length());
 
         String diff;
-        if (el.getInfoType() == DiffInfo.InfoType.REPLACE
-            || el.getInfoType() == DiffInfo.InfoType.INSERT) {
+        if (el.getDiffType() == DiffType.REPLACE
+            || el.getDiffType() == DiffType.INSERT) {
           diff = fmt.format(enc.encode(targetS.substring(
-              el.getTargetStart(), el.getTargetEnd() + 1)), el.getInfoType());
+              el.getTargetStart(), el.getTargetEnd() + 1)), el.getDiffType());
         } else {
-          diff = fmt.format(enc.encode(sourceS.substring(start, end)), el.getInfoType());
+          diff = fmt.format(enc.encode(sourceS.substring(start, end)), el.getDiffType());
         }
 
         String line = "*> "

@@ -1,8 +1,7 @@
 package org.bytediff.print.fmt;
 
-import org.bytediff.engine.DiffInfo;
-
 import java.util.EnumMap;
+import org.bytediff.engine.DiffInfo.DiffType;
 
 public class AnsiColorFormatter implements Formatter {
 
@@ -38,48 +37,48 @@ public class AnsiColorFormatter implements Formatter {
     }
   }
 
-  EnumMap<DiffInfo.InfoType, ForegroundColor> fgColor;
-  EnumMap<DiffInfo.InfoType, BackgroundColor> bgColor;
+  EnumMap<DiffType, ForegroundColor> fgColor;
+  EnumMap<DiffType, BackgroundColor> bgColor;
 
   public AnsiColorFormatter() {
-    fgColor = new EnumMap<>(DiffInfo.InfoType.class);
-    bgColor = new EnumMap<>(DiffInfo.InfoType.class);
+    fgColor = new EnumMap<>(DiffType.class);
+    bgColor = new EnumMap<>(DiffType.class);
 
-    bgColor.put(DiffInfo.InfoType.INSERT, BackgroundColor.GREEN);
-    fgColor.put(DiffInfo.InfoType.INSERT, ForegroundColor.BLACK);
+    bgColor.put(DiffType.INSERT, BackgroundColor.GREEN);
+    fgColor.put(DiffType.INSERT, ForegroundColor.BLACK);
 
-    bgColor.put(DiffInfo.InfoType.DELETE, BackgroundColor.RED);
-    fgColor.put(DiffInfo.InfoType.DELETE, ForegroundColor.BLACK);
+    bgColor.put(DiffType.DELETE, BackgroundColor.RED);
+    fgColor.put(DiffType.DELETE, ForegroundColor.BLACK);
 
-    bgColor.put(DiffInfo.InfoType.REPLACE, BackgroundColor.YELLOW);
-    fgColor.put(DiffInfo.InfoType.REPLACE, ForegroundColor.BLACK);
+    bgColor.put(DiffType.REPLACE, BackgroundColor.YELLOW);
+    fgColor.put(DiffType.REPLACE, ForegroundColor.BLACK);
   }
 
   public AnsiColorFormatter withInsertionColors(ForegroundColor fgColor, BackgroundColor bgColor) {
-    this.fgColor.put(DiffInfo.InfoType.INSERT, fgColor);
-    this.bgColor.put(DiffInfo.InfoType.INSERT, bgColor);
+    this.fgColor.put(DiffType.INSERT, fgColor);
+    this.bgColor.put(DiffType.INSERT, bgColor);
     return this;
   }
 
   public AnsiColorFormatter withDeletionColors(ForegroundColor fgColor, BackgroundColor bgColor) {
-    this.fgColor.put(DiffInfo.InfoType.DELETE, fgColor);
-    this.bgColor.put(DiffInfo.InfoType.DELETE, bgColor);
+    this.fgColor.put(DiffType.DELETE, fgColor);
+    this.bgColor.put(DiffType.DELETE, bgColor);
     return this;
   }
 
   public AnsiColorFormatter withReplacementColors(ForegroundColor fgColor,
       BackgroundColor bgColor) {
-    this.fgColor.put(DiffInfo.InfoType.REPLACE, fgColor);
-    this.bgColor.put(DiffInfo.InfoType.REPLACE, bgColor);
+    this.fgColor.put(DiffType.REPLACE, fgColor);
+    this.bgColor.put(DiffType.REPLACE, bgColor);
     return this;
   }
 
   @Override
-  public String format(String value, DiffInfo.InfoType type) {
+  public String format(String value, DiffType type) {
     return ansiColor(type) + value + ansiResetColor();
   }
 
-  private String ansiColor(DiffInfo.InfoType type) {
+  private String ansiColor(DiffType type) {
     ForegroundColor fgColor = this.fgColor.get(type);
     BackgroundColor bgColor = this.bgColor.get(type);
 

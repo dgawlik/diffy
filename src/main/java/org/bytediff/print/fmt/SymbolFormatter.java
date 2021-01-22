@@ -1,11 +1,11 @@
 package org.bytediff.print.fmt;
 
-import org.bytediff.engine.DiffInfo;
+import org.bytediff.engine.DiffInfo.DiffType;
 
 public class SymbolFormatter implements Formatter {
 
   @Override
-  public String format(String value, DiffInfo.InfoType type) {
+  public String format(String value, DiffType type) {
     switch (type) {
       case INSERT:
         return "++[" + value + "]";
