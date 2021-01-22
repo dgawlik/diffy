@@ -38,6 +38,7 @@ public class Diff {
      * source to target.
      */
     @Data
+    @SuppressWarnings("PMD.CommentRequired")
     private static class EditNode {
         private int sourceIndex;    //operation happening on source from this index inclusive
 
@@ -70,7 +71,7 @@ public class Diff {
      */
     public DiffInfo compute(final char[] source, final char[] target) {
         final List<EditNode> stage1Result = computeEditPath(source, target);
-        final List<DiffInfo.Info> stage2Result = computeInfo(stage1Result, source, target);
+        final List<DiffInfo.Info> stage2Result = computeInfo(stage1Result);
         enforceSurrogatePairs(source, stage2Result);
         return new DiffInfo(source, target, stage2Result);
     }
@@ -86,34 +87,34 @@ public class Diff {
             if (Character.isHighSurrogate(candidate)) {
                 if (curr.getInfoType() == DiffInfo.InfoType.MATCH
                         && next.getInfoType() == DiffInfo.InfoType.REPLACE) {
-                    curr.setSourceEnd(curr.getSourceEnd() - 1);
-                    next.setSourceStart(next.getSourceStart() - 1);
-                    curr.setTargetEnd(curr.getTargetStart() - 1);
-                    next.setTargetStart(next.getTargetEnd() - 1);
+                    curr.sourceEnd = curr.sourceEnd - 1;
+                    next.sourceStart = next.sourceStart - 1;
+                    curr.targetEnd = curr.targetEnd - 1;
+                    next.targetStart = next.targetStart - 1;
                 }
                 if (curr.getInfoType() == DiffInfo.InfoType.REPLACE
                         && next.getInfoType() == DiffInfo.InfoType.MATCH) {
-                    curr.setSourceEnd(curr.getSourceEnd() + 1);
-                    next.setSourceStart(next.getSourceStart() + 1);
-                    curr.setTargetEnd(curr.getTargetStart() + 1);
-                    next.setTargetStart(next.getTargetEnd() + 1);
+                    curr.sourceEnd = curr.sourceEnd + 1;
+                    next.sourceStart = next.sourceStart + 1;
+                    curr.targetEnd = curr.targetEnd + 1;
+                    next.targetStart = next.targetStart + 1;
                 }
             }
         }
     }
 
 
-    private List<DiffInfo.Info> computeInfo(List<EditNode> path, char[] source, char[] target) {
+    private List<DiffInfo.Info> computeInfo(List<EditNode> path) {
 
-        List<EditNode> inserts = new ArrayList<>();
-        List<EditNode> deletes = new ArrayList<>();
-        List<EditNode> matches = new ArrayList<>();
+        final List<EditNode> inserts = new ArrayList<>();
+        final List<EditNode> deletes = new ArrayList<>();
+        final List<EditNode> matches = new ArrayList<>();
 
-        List<DiffInfo.Info> result = new ArrayList<>();
+        final List<DiffInfo.Info> result = new ArrayList<>();
 
-        path = path.subList(2, path.size());
+        final List<EditNode> trimmedPath =  path.subList(2, path.size());
 
-        for (EditNode node : path) {
+        for (final EditNode node : trimmedPath) {
             Op op = node.getOperation();
 
             if (op == Op.INSERT || op == Op.DELETE) {

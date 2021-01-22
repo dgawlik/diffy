@@ -19,24 +19,19 @@ public class DiffInfo {
     @AllArgsConstructor
     public static class Info {
         @Getter
-        @Setter(AccessLevel.PACKAGE)
-        private InfoType infoType;
+        InfoType infoType;
 
         @Getter
-        @Setter(AccessLevel.PACKAGE)
-        private Integer sourceStart;
+        Integer sourceStart;
 
         @Getter
-        @Setter(AccessLevel.PACKAGE)
-        private Integer sourceEnd;
+        Integer sourceEnd;
 
         @Getter
-        @Setter(AccessLevel.PACKAGE)
-        private Integer targetStart;
+        Integer targetStart;
 
         @Getter
-        @Setter(AccessLevel.PACKAGE)
-        private Integer targetEnd;
+        Integer targetEnd;
     }
 
     @Getter private final List<Info> info;
