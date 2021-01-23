@@ -11,49 +11,53 @@ import org.junit.jupiter.api.Test;
 
 public class UseCasesTest {
 
-    @Test
-    public void mismatch_1() {
-        char[] source = "aJohnDoe".toCharArray();
-        char[] target = "aBBBBDoe".toCharArray();
+  @Test
+  public void mismatch_1() {
+    char[] source = "quickbrownfoxjumpingoverlazydown".toCharArray();
+    char[] target = "quickfoxjumpingoverlazydown".toCharArray();
 
-        DiffInfo info = Diff.compute(source, target);
-        System.out.println(Printer.from(info).print());
-    }
+    DiffInfo info = Diff.compute(source, target);
+    String result = Printer
+        .from(info)
+        .withFormatter(new AnsiColorFormatter())
+        .print();
+    System.out.println(result);
+  }
 
-    @Test
-    public void mismatch_2() {
-        char[] source = "abdJohnDoe😉".toCharArray();
-        char[] target = "abcaaJohnDoe😊".toCharArray();
+  @Test
+  public void mismatch_2() {
+    char[] source = "abdJohnDoe😉".toCharArray();
+    char[] target = "abcaaJohnDoe😊".toCharArray();
 
-        DiffInfo info = Diff.compute(source, target);
-        System.out.println(Printer.from(info).verbose().print());
-    }
+    DiffInfo info = Diff.compute(source, target);
+    System.out.println(Printer.from(info).verbose().print());
+  }
 
 
-    @Test
-    public void verbose() {
-        char[] source = "jooohnbb".toCharArray();
-        char[] target = "johnaa".toCharArray();
+  @Test
+  public void verbose() {
+    char[] source = "jooohnbb".toCharArray();
+    char[] target = "johnaa".toCharArray();
 
-        DiffInfo info = Diff.compute(source, target);
-        Printer p = Printer.from(info).withFormatter(new AnsiColorFormatter());
-        System.out.println(p.print());
-    }
+    DiffInfo info = Diff.compute(source, target);
+    Printer p = Printer.from(info).withFormatter(new AnsiColorFormatter());
+    System.out.println(p.print());
+  }
 
-    @Test
-    public void raw_bytes() {
-        byte[] source = new byte[]{1, 2, 3};
-        byte[] target = new byte[]{4, 2, 3};
+  @Test
+  public void raw_bytes() {
+    byte[] source = new byte[]{1, 2, 3};
+    byte[] target = new byte[]{4, 2, 3};
 
-        char[] sourceC = Raw.bytesToChars(source);
-        char[] targetC = Raw.bytesToChars(target);
+    char[] sourceC = Raw.bytesToChars(source);
+    char[] targetC = Raw.bytesToChars(target);
 
-        DiffInfo info = Diff.compute(sourceC, targetC);
-        Printer p = Printer
-                .from(info)
-                .withEncoding(new RawValueEncoder(10));
-        System.out.println(p.print());
-    }
+    DiffInfo info = Diff.compute(sourceC, targetC);
+    Printer p = Printer
+        .from(info)
+        .withEncoding(new RawValueEncoder(10));
+    System.out.println(p.print());
+  }
 
 
 }

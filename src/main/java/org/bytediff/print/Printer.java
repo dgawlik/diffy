@@ -74,7 +74,14 @@ public final class Printer {
         int end = diffElement.getSourceEnd() + 1;
 
         int contextLeftStart = Math.max(0, start - this.contextLeft);
-        int contextLeftEnd = start;
+        int contextLeftEnd;
+        if (diffElement.getDiffType() == DiffType.REPLACE
+            || diffElement.getDiffType() == DiffType.INSERT) {
+          contextLeftEnd = start + 1;
+        } else {
+          contextLeftEnd = start;
+        }
+
         int contextRightStart = Math.min(end, source.length);
         int contextRightEnd = Math.min(end + contextRight, source.length);
 
@@ -95,7 +102,7 @@ public final class Printer {
         String line = "*> "
             + (contextLeftStart == contextLeftEnd
             ? "" : (contextLeftStart == 0 ? "" : "...")
-                + newSlice(contextLeftStart, contextLeftEnd, source))
+            + newSlice(contextLeftStart, contextLeftEnd, source))
             + diff
             + (contextRightStart == contextRightEnd
             ? "" : newSlice(contextRightStart, contextRightEnd, source) + "...")
