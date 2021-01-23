@@ -26,7 +26,7 @@ public class UseCasesTest {
         char[] target = "abcaaJohnDoe😊".toCharArray();
 
         DiffInfo info = Diff.compute(source, target);
-        System.out.println(Printer.from(info).print());
+        System.out.println(Printer.from(info).verbose().print());
     }
 
 

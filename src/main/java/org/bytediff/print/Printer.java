@@ -75,7 +75,7 @@ public final class Printer {
 
         int contextLeftStart = Math.max(0, start - this.contextLeft);
         int contextLeftEnd = start;
-        int contextRightStart = Math.min(end + 1, source.length);
+        int contextRightStart = Math.min(end, source.length);
         int contextRightEnd = Math.min(end + contextRight, source.length);
 
         String diff;
@@ -93,7 +93,7 @@ public final class Printer {
         }
 
         String line = "*> "
-            + (contextLeftStart == contextLeftEnd
+            + (contextLeftStart == 0
             ? "" : "..." + newSlice(contextLeftStart, contextLeftEnd, source))
             + diff
             + (contextRightStart == contextRightEnd
