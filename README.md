@@ -92,7 +92,7 @@ Console:
 Now the output is one line per insert|delete|replace
 with preceding 7 characters and followed by 4 characters.
 
-If this symbolic representation is be confusing there is an
+If this symbolic representation is confusing there is an
 option to display modifications in color.
 
 Let's modify our first example:
