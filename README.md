@@ -109,7 +109,7 @@ System.out.println(result);
 ```
 Console:
 
-quick<span style="background: red; color:black;">brown</span>foxjumpingoverlazydown
+<p>quick<span style="background: red; color:black;">brown</span>foxjumpingoverlazydown</p>
 
 Now thanks to ansi color code formatter we can print in colors.
 
