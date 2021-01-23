@@ -93,8 +93,9 @@ public final class Printer {
         }
 
         String line = "*> "
-            + (contextLeftStart == 0
-            ? "" : "..." + newSlice(contextLeftStart, contextLeftEnd, source))
+            + (contextLeftStart == contextLeftEnd
+            ? "" : (contextLeftStart == 0 ? "" : "...")
+                + newSlice(contextLeftStart, contextLeftEnd, source))
             + diff
             + (contextRightStart == contextRightEnd
             ? "" : newSlice(contextRightStart, contextRightEnd, source) + "...")
