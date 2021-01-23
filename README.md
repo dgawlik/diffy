@@ -107,11 +107,7 @@ String result = Printer
   .print();
 System.out.println(result);
 ```
-Console:
 
-<p>quick<span style="background: red; color:black;">brown</span>foxjumpingoverlazydown</p>
-
-Now thanks to ansi color code formatter we can print in colors.
 
 Lastly when working with raw bytes, we don't care what the string 
 looks like because much of our sequnce won't be printable. So we 
