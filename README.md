@@ -66,7 +66,7 @@ delete word *brown*. Here *--[word]* stands for delete, *++[word]* for
 insertion and *~~[word]* for replacement. A match prints sequence
 unchanged.
 
-When it comes to really long strings this output would be a little long.
+When it comes to really long strings this output wouldn't be so handy.
 There is a way to see **only** the modification
 itself and with some surrounding context.
 
