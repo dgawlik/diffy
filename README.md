@@ -133,13 +133,5 @@ Console:
 
 ### Contributing
 
-PR's are welcome and also feel free to fork this repository.
-There is couple of cool things that could be further done:
-* benchmarking Diff.compute() and see if it could be made
-generic (switching == to equals()) 
-* implement comparing files line by line (line mode)
-* compile with picocli and graalvm to cmdline tool comparing files
-* generate basic html reports for files
-
-If any of these topics interests you, submit PR or drop me
-an email at: dominik.gawlik1@gmail.com.
+If you would like to raise an issue, submit 
+PR or suggest improvement feel free to do so.
