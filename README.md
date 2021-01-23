@@ -4,9 +4,9 @@
 ![Download](https://img.shields.io/badge/coverage-89%25-blue)
 ![Download](https://img.shields.io/badge/PR's-welcome-green)
 
-Project is attempt to ease work on parsing
-long char/byte sequences. It does that by providing diff functionality
-in Java. Under the hood it is an implementation of **[Meyer's](https://neil.fraser.name/writing/diff/myers.pdf) general purpose diff
+Project attempts to ease work on parsing
+long char/byte sequences by providing diff functionality
+in Java. At the core it is an implementation of **[Meyer's](https://neil.fraser.name/writing/diff/myers.pdf) general purpose diff
 algorithm**. Comparisons return structure containing *insert|delete|replace|match* ranges.
 
 ### Features
@@ -15,7 +15,7 @@ Here are some tool's features:
 * fast general purpose diff in nearly linear time for
   similar sequences
 * readable representation of diff result either symbolic or
-  colorfull 
+  colorful
 * extensible and configurable
 * minimal dependencies 
 * implementation with ease of understanding in mind
@@ -42,7 +42,7 @@ implementation 'org.bytediff:diffy:1.1.0'
 
 ### Usage
 
-So you want to compare two strings...
+Let's start with comparing two strings:
 
 ```java
 char[] source = "quickbrownfoxjumpingoverlazydog".toCharArray();
@@ -57,20 +57,20 @@ Console:
 quick--[brown]foxjumpingoverlazydog
 ```
 Comparing two arrays is results in *DiffInfo*. It holds various
-methods for retrieving diff result programatically. Currently
+methods for retrieving diff data programmatically. Currently
 there is one *Printer* but it is fully configurable, more
 on this in the next example.
 
-We can see that to make source comparable to target we need to
-delete word *brown*. *--[word]* stands for delete, *++[word]* for
-insertion and *~~[word]* for replacement. Match prints sequence
+According to console output to make source comparable to target we need to
+delete word *brown*. Here *--[word]* stands for delete, *++[word]* for
+insertion and *~~[word]* for replacement. A match prints sequence
 unchanged.
 
-This is somewhat helpful but what if you had really long string?
-Then only thing you would want to see is **only** the modification
-itself, possibly with some context.
+When it comes to really long strings this output would be a little long.
+There is a way to see **only** the modification
+itself and with some surrounding context.
 
-Here is our next example:
+Here is the next example:
 ```java
 char[] source = "quickbrownfoxjumpingoverlazydown".toCharArray();
 char[] target = "quickfoxjumpingoverlazydown".toCharArray();
@@ -89,11 +89,11 @@ Console:
 ...brownfox++[jumping]over...
 ```
 
-Now the output is one line for insert|delete|replace
+Now the output is one line per insert|delete|replace
 with preceding 7 characters and followed by 4 characters.
 
-But this symbolic representation can be confusing what if
-we could have it color printed?
+If this symbolic representation is be confusing there is an
+option to display modifications in color.
 
 Let's modify our first example:
 ```java
@@ -109,9 +109,8 @@ System.out.println(result);
 ```
 
 
-Lastly when working with raw bytes, we don't care what the string 
-looks like because much of our sequnce won't be printable. So we 
-need to encode somehow raw bytes to char[] and then compare them.
+Lastly in case of working with raw bytes, much of the sequence wouldn't be printable. 
+The next example encodes raw bytes to char[] and then displays their ordinals.
 
 ```java
 byte[] source = new byte[]{1, 2, 3};
@@ -133,5 +132,5 @@ Console:
 
 ### Contributing
 
-If you would like to raise an issue, submit 
-PR or suggest improvement feel free to do so.
+Feel free to raise an issue, submit 
+PR or suggest improvement.
